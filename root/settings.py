@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'apps',
-    'ckeditor'
+    'django_ckeditor_5'
 ]
 
 # AUTH_USER_MODEL = 'apps.User'
