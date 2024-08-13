@@ -1,48 +1,38 @@
-from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.models import User
-from django.db import models
-from django.db.models import JSONField
+from django.db.models import Model, DateTimeField, CharField, SlugField, ImageField, ForeignKey, CASCADE, TextField, \
+    DecimalField, PositiveIntegerField, ManyToManyField
 from django.utils.text import slugify
-from django_ckeditor_5.fields import CKEditor5Field
+from mptt.fields import TreeForeignKey
+from django_resized import ResizedImageField
 from mptt.models import MPTTModel
-from mptt.models import MPTTModel, TreeForeignKey
 
 
-class Category(MPTTModel):
-    name = models.CharField(max_length=255, unique=True)
-    slug = models.SlugField(max_length=255, unique=True, editable=False)
-    parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
+class BaseModel(Model):
+    created_at = DateTimeField(auto_now_add=True)
+    updated_at = DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class BaseSlugModel(Model):
+    name = CharField(max_length=255)
+    slug = SlugField(unique=True)
+
+    class Meta:
+        abstract = True
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        if not self.slug:
-            self.slug = slugify(self.name)
-            unique = self.slug
-            num = 1
-            while Category.objects.filter(slug=unique).exists():
-                unique = f'{self.slug}-{num}'
-                num += 1
-            self.slug = unique
+        self.slug = slugify(self.name)
+        while self.__class__.objects.filter(slug=self.slug).exists():
+            self.slug += '-1'
         super().save(force_insert, force_update, using, update_fields)
-
-    class MPTTMeta:
-        order_insertion_by = ['name']
 
     def __str__(self):
         return self.name
 
-class Product(models.Model):
-    title = models.CharField(max_length=355)
-    slug = models.SlugField
-    price = models.DecimalField(max_digits=7, decimal_places=2)
-    quantity = models.PositiveIntegerField(default=0)
-    description = JSONField()
-    category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
-    tag = models.ManyToManyField('Tag', related_name='tag')
 
-    def __str__(self):
-        return self.title
+class ProductImage(Model):
+    image = ImageField(upload_to='products/')
+    product = ForeignKey('apps.Product', CASCADE, related_name='images')
 
-    @property
-    def in_stock(self):
-        return self.quantity > 0
-
+# Create your models here.
