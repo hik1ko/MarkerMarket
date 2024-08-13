@@ -1,6 +1,8 @@
-from django.db import models
-from django.db.models import Model, DateTimeField, CharField, SlugField, ImageField, ForeignKey, CASCADE
+from django.db.models import Model, DateTimeField, CharField, SlugField, ImageField, ForeignKey, CASCADE, TextField, \
+    DecimalField, PositiveIntegerField, ManyToManyField
 from django.utils.text import slugify
+from mptt.fields import TreeForeignKey
+from django_resized import ResizedImageField
 from mptt.models import MPTTModel
 
 
@@ -34,3 +36,43 @@ class ProductImage(Model):
     product = ForeignKey('apps.Product', CASCADE, related_name='images')
 
 
+class Category(MPTTModel):
+    name = CharField(max_length=255, unique=True)
+    image = ResizedImageField(size=[200, 200], quality=100, upload_to='images/', force_format='png', blank='True')
+    slug = SlugField(max_length=255, unique=True, editable=False)
+    parent = TreeForeignKey('self', on_delete=CASCADE, null=True, blank=True, related_name='children')
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if not self.slug:
+            self.slug = slugify(self.name)
+            unique = self.slug
+            num = 1
+            while Category.objects.filter(slug=unique).exists():
+                unique = f'{self.slug}-{num}'
+                num += 1
+            self.slug = unique
+        super().save(force_insert, force_update, using, update_fields)
+
+    class MPTTMeta:
+        order_insertion_by = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class Product(BaseModel, BaseSlugModel):
+    name = CharField(max_length=255)
+    slug = SlugField
+    price = DecimalField(max_digits=7, decimal_places=2)
+    quantity = PositiveIntegerField(default=0)
+    description = TextField(blank=True)
+    category_id = ForeignKey(Category, on_delete=CASCADE)
+    tag = ManyToManyField('Tag', related_name='tag')
+    company_name = CharField(max_length=255)
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def in_stock(self):
+        return self.quantity > 0
