@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Model, DateTimeField, CharField, SlugField, ImageField, ForeignKey, CASCADE
 from django.utils.text import slugify
+from mptt.models import MPTTModel
 
 
 class BaseModel(Model):
@@ -31,3 +32,5 @@ class BaseSlugModel(Model):
 class ProductImage(Model):
     image = ImageField(upload_to='products/')
     product = ForeignKey('apps.Product', CASCADE, related_name='images')
+
+
