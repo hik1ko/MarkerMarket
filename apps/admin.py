@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 
-from apps.models import Product, Category, SiteSettings
+from apps.models import Product, Category
 
 
 @admin.register(Product)
@@ -14,6 +14,3 @@ class CategoryAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(SiteSettings)
-class SiteSettingsAdmin(admin.ModelAdmin):
-    pass
