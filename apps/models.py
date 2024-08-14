@@ -1,5 +1,5 @@
 from django.db.models import Model, DateTimeField, CharField, SlugField, ImageField, ForeignKey, CASCADE, TextField, \
-    DecimalField, PositiveIntegerField, ManyToManyField
+    DecimalField, PositiveIntegerField, ManyToManyField, EmailField
 from django.utils.text import slugify
 from django_resized import ResizedImageField
 from mptt.fields import TreeForeignKey
@@ -66,8 +66,8 @@ class Product(BaseModel, BaseSlugModel):
     price = DecimalField(max_digits=7, decimal_places=2)
     quantity = PositiveIntegerField(default=0)
     description = TextField(blank=True)
-    category_id = ForeignKey(Category, on_delete=CASCADE)
-    tag = ManyToManyField('Tag', related_name='tag')
+    category_id = ForeignKey('apps.Category', on_delete=CASCADE, related_name='products')
+    # tag = ManyToManyField('Tag', related_name='tag')
     company_name = CharField(max_length=255)
 
     def __str__(self):
@@ -76,3 +76,10 @@ class Product(BaseModel, BaseSlugModel):
     @property
     def in_stock(self):
         return self.quantity > 0
+
+
+class User(BaseModel, BaseSlugModel):
+    full_name = CharField(max_length=255)
+    email = EmailField(unique=True)
+    password = CharField(max_length=255)
+    phone_number = CharField(max_length=255)
