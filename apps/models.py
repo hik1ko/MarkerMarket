@@ -31,11 +31,6 @@ class BaseSlugModel(Model):
         return self.name
 
 
-class ProductImage(Model):
-    image = ImageField(upload_to='products/')
-    product = ForeignKey('apps.Product', CASCADE, related_name='images')
-
-
 class Category(MPTTModel):
     name = CharField(max_length=255, unique=True)
     image = ResizedImageField(size=[200, 200], quality=100, upload_to='images/', force_format='png', blank='True')
@@ -71,8 +66,13 @@ class Product(BaseModel, BaseSlugModel):
     company_name = CharField(max_length=255)
 
     def __str__(self):
-        return self.title
+        return self.name
 
     @property
     def in_stock(self):
         return self.quantity > 0
+
+
+class ProductImage(Model):
+    image = ImageField(upload_to='products/')
+    product = ForeignKey('apps.Product', CASCADE, related_name='images')
