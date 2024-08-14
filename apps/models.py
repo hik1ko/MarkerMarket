@@ -67,7 +67,7 @@ class Product(BaseModel, BaseSlugModel):
     quantity = PositiveIntegerField(default=0)
     description = TextField(blank=True)
     category_id = ForeignKey(Category, on_delete=CASCADE)
-    tag = ManyToManyField('Tag', related_name='tag')
+    # tag = ManyToManyField('Tag', related_name='tag')
     company_name = CharField(max_length=255)
 
     def __str__(self):
