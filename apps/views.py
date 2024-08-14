@@ -1,8 +1,10 @@
+from django.shortcuts import render
 from django.views.generic import TemplateView
 
-from apps.models import Product
+
+# Create your views here.
 
 
 class HomeView(TemplateView):
-    queryset = Product.objects.all()
-    template_name = 'apps/index.html'
+    template_name = 'apps/base/index.html'
+

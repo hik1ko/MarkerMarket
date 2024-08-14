@@ -1,8 +1,8 @@
 from django.db.models import Model, DateTimeField, CharField, SlugField, ImageField, ForeignKey, CASCADE, TextField, \
-    DecimalField, PositiveIntegerField, ManyToManyField
+    DecimalField, PositiveIntegerField, ManyToManyField, EmailField
 from django.utils.text import slugify
-from mptt.fields import TreeForeignKey
 from django_resized import ResizedImageField
+from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
 
@@ -31,6 +31,11 @@ class BaseSlugModel(Model):
         return self.name
 
 
+class ProductImage(Model):
+    image = ImageField(upload_to='products/')
+    product = ForeignKey('apps.Product', CASCADE, related_name='images')
+
+
 class Category(MPTTModel):
     name = CharField(max_length=255, unique=True)
     image = ResizedImageField(size=[200, 200], quality=100, upload_to='images/', force_format='png', blank='True')
@@ -55,24 +60,4 @@ class Category(MPTTModel):
         return self.name
 
 
-class Product(BaseModel, BaseSlugModel):
-    name = CharField(max_length=255)
-    slug = SlugField
-    price = DecimalField(max_digits=7, decimal_places=2)
-    quantity = PositiveIntegerField(default=0)
-    description = TextField(blank=True)
-    category_id = ForeignKey(Category, on_delete=CASCADE)
-    # tag = ManyToManyField('Tag', related_name='tag')
-    company_name = CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
-
-    @property
-    def in_stock(self):
-        return self.quantity > 0
-
-
-class ProductImage(Model):
-    image = ImageField(upload_to='products/')
-    product = ForeignKey('apps.Product', CASCADE, related_name='images')
+# Create your models here.
