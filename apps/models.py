@@ -1,5 +1,6 @@
+from django.contrib.auth.models import AbstractUser
 from django.db.models import Model, DateTimeField, CharField, SlugField, ImageField, ForeignKey, CASCADE, TextField, \
-    DecimalField, PositiveIntegerField, ManyToManyField
+    DecimalField, PositiveIntegerField, ManyToManyField, IntegerField, EmailField, TextChoices
 from django.utils.text import slugify
 from mptt.fields import TreeForeignKey
 from django_resized import ResizedImageField
@@ -29,6 +30,13 @@ class BaseSlugModel(Model):
 
     def __str__(self):
         return self.name
+
+
+class User(AbstractUser):
+    email = EmailField()
+    password = TextField()
+    Fullname = CharField(max_length=255)
+    phone_number = CharField(max_length=50, null=False, unique=True)
 
 
 class ProductImage(Model):
@@ -71,8 +79,14 @@ class Product(BaseModel, BaseSlugModel):
     company_name = CharField(max_length=255)
 
     def __str__(self):
-        return self.title
+        return self.name
 
     @property
     def in_stock(self):
         return self.quantity > 0
+
+
+class SiteSettings(Model):
+    phone_number = IntegerField()
+    email = EmailField()
+    address = TextField()
