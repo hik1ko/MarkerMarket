@@ -1,11 +1,28 @@
-from unittest.mock import Base
-
+from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import AbstractUser
 from django.db.models import Model, DateTimeField, CharField, SlugField, ImageField, ForeignKey, CASCADE, TextField, \
     DecimalField, PositiveIntegerField, ManyToManyField, IntegerField, EmailField, TextChoices
 from django.utils.text import slugify
 from mptt.fields import TreeForeignKey
 from django_resized import ResizedImageField
 from mptt.models import MPTTModel
+
+
+class CustomUserManager(BaseUserManager):
+    def create_user(self, phone_number, password=None, **extra_fields):
+        if not phone_number:
+            raise ValueError('The Phone Number field must be set')
+        user = self.model(phone_number=phone_number, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, phone_number, password, **extra_fields):
+        user = self.create_user(phone_number, password, **extra_fields)
+        user.is_superuser = True
+        user.is_staff = True
+        user.save(using=self._db)
+        return user
 
 
 class BaseModel(Model):
@@ -52,6 +69,46 @@ class Category(MPTTModel):
 
     class MPTTMeta:
         order_insertion_by = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class User(AbstractUser):
+    class Role(TextChoices):
+        ADMIN = "admin", 'Admin'
+        OPERATOR = "operator", 'Operator'
+        MANAGER = "manager", 'Manager'
+        DRIVER = "driver", 'Driver'
+        USER = "user", 'User'
+
+    username = None
+    USERNAME_FIELD = 'phone'
+    EMAIL_FIELD = EmailField(unique=True)
+    REQUIRED_FIELDS = []
+    objects = CustomUserManager()
+    role = CharField(max_length=50, choices=Role.choices, default=Role.USER)
+    full_name = CharField(max_length=255)
+    password = CharField(max_length=255)
+    phone = CharField(max_length=13, unique=True)
+
+
+class Address(BaseModel):
+    street = CharField(max_length=255)
+    home = CharField(max_length=255)
+    district = ForeignKey('apps.District', CASCADE, related_name='addresses')
+
+
+class Region(Model):
+    name = CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class District(Model):
+    name = CharField(max_length=255, unique=True)
+    region = ForeignKey('apps.Region', CASCADE, related_name='districts')
 
     def __str__(self):
         return self.name
@@ -110,6 +167,17 @@ class Order(Model):
 
 
 class SiteSettings(Model):
-    phone_number = IntegerField()
-    email = EmailField()
-    address = TextField()
+    company_phone_number = IntegerField()
+    company_email = EmailField()
+    company_address = TextField()
+
+
+class ad_post(Model):
+    category_id = ForeignKey(Category, on_delete=CASCADE)
+    image = ImageField(upload_to='ad_posts/')
+
+
+class Cart(Model):
+    product_id = ForeignKey(Product, on_delete=CASCADE)
+    count = IntegerField()
+    created_at = DateTimeField(auto_now_add=True)
