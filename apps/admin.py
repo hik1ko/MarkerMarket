@@ -13,8 +13,7 @@ class ProductModelAdmin(ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     pass
 
+
 @admin.register(Tag)
-class Tag(ModelAdmin)
+class Tag(ModelAdmin):
     pass
-
-
