@@ -172,7 +172,7 @@ class SiteSettings(Model):
     company_address = TextField()
 
 
-class ad_post(Model):
+class AdPost(Model):
     category_id = ForeignKey(Category, on_delete=CASCADE)
     image = ImageField(upload_to='ad_posts/')
 

@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 
-from apps.models import Product, Category, Tag, ad_post, Cart
+from apps.models import Product, Category, Tag, AdPost, Cart
+from apps.models import Product, Category, Tag, Address
 
 
 @admin.register(Product)
@@ -10,7 +11,7 @@ class ProductModelAdmin(ModelAdmin):
 
 
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(ModelAdmin):
     pass
 
 
@@ -19,11 +20,16 @@ class Tag(ModelAdmin):
     pass
 
 
-@admin.register(ad_post)
-class ad_post(ModelAdmin):
+@admin.register(AdPost)
+class AdPost(ModelAdmin):
     pass
 
 
 @admin.register(Cart)
 class Cart(ModelAdmin):
+    pass
+
+
+@admin.register(Address)
+class Address(ModelAdmin):
     pass

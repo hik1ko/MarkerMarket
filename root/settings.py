@@ -32,7 +32,7 @@ INSTALLED_APPS = [
     'mptt'
 ]
 
-# AUTH_USER_MODEL = 'apps.User'
+AUTH_USER_MODEL = 'apps.User'
 # LOGOUT_REDIRECT_URL = 'home'
 # LOGIN_URL = 'login'
 
