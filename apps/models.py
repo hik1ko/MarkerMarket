@@ -170,3 +170,14 @@ class SiteSettings(Model):
     company_phone_number = IntegerField()
     company_email = EmailField()
     company_address = TextField()
+
+
+class ad_post(Model):
+    category_id = ForeignKey(Category, on_delete=CASCADE)
+    image = ImageField(upload_to='ad_posts/')
+
+
+class Cart(Model):
+    product_id = ForeignKey(Product, on_delete=CASCADE)
+    count = IntegerField()
+    created_at = DateTimeField(auto_now_add=True)
