@@ -1,10 +1,10 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Model, DateTimeField, CharField, SlugField, ImageField, ForeignKey, CASCADE, TextField, \
-    DecimalField, PositiveIntegerField, ManyToManyField, IntegerField, EmailField, TextChoices
+    DecimalField, PositiveIntegerField, IntegerField, EmailField, TextChoices
 from django.utils.text import slugify
-from mptt.fields import TreeForeignKey
 from django_resized import ResizedImageField
+from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
 
@@ -75,22 +75,11 @@ class Category(MPTTModel):
 
 
 class User(AbstractUser):
-    class Role(TextChoices):
-        ADMIN = "admin", 'Admin'
-        OPERATOR = "operator", 'Operator'
-        MANAGER = "manager", 'Manager'
-        DRIVER = "driver", 'Driver'
-        USER = "user", 'User'
-
-    username = None
-    USERNAME_FIELD = 'phone'
-    EMAIL_FIELD = EmailField(unique=True)
-    REQUIRED_FIELDS = []
-    objects = CustomUserManager()
-    role = CharField(max_length=50, choices=Role.choices, default=Role.USER)
     full_name = CharField(max_length=255)
+    email = CharField(max_length=255, unique=True)
+    username = CharField(max_length=255, unique=True)
     password = CharField(max_length=255)
-    phone = CharField(max_length=13, unique=True)
+    phone_number = CharField(max_length=255)
 
 
 class Address(BaseModel):
