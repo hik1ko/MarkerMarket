@@ -27,7 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps',
     'django_ckeditor_5',
-    'mptt'
+    'mptt',
 ]
 
 AUTH_USER_MODEL = 'apps.User'

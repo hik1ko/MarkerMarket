@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 
-from apps.models import Product, Category, Tag, AdPost, Cart
+from apps.models import AdPost, Cart
 from apps.models import Product, Category, Tag, Address
 
 
