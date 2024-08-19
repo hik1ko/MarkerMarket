@@ -9,16 +9,16 @@ from mptt.models import MPTTModel
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, phone_number, password=None, **extra_fields):
-        if not phone_number:
-            raise ValueError('The Phone Number field must be set')
-        user = self.model(phone_number=phone_number, **extra_fields)
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, phone_number, password, **extra_fields):
-        user = self.create_user(phone_number, password, **extra_fields)
+    def create_superuser(self, email, password, **extra_fields):
+        user = self.create_user(email, password, **extra_fields)
         user.is_superuser = True
         user.is_staff = True
         user.save(using=self._db)
@@ -82,22 +82,22 @@ class User(AbstractUser):
         DRIVER = "driver", 'Driver'
         USER = "user", 'User'
 
-    username = None
     USERNAME_FIELD = 'email'
-    EMAIL_FIELD = EmailField(unique=True)
+    email = EmailField(unique=True)
     REQUIRED_FIELDS = []
     objects = CustomUserManager()
     role = CharField(max_length=50, choices=Role.choices, default=Role.USER)
     full_name = CharField(max_length=255)
     password = CharField(max_length=255)
     phone = CharField(max_length=13, unique=True)
-    address = ForeignKey('apps.Address', on_delete=CASCADE, default="-", related_name='addresses')
+    # address = ForeignKey('apps.Address', on_delete=CASCADE, default="-", related_name='addresses')
 
 
 class Address(BaseModel):
     street = CharField(max_length=255)
     home = CharField(max_length=255)
     district = ForeignKey('apps.District', CASCADE, related_name='addresses')
+    user = ForeignKey(User, on_delete=CASCADE, related_name='address', default=None)
 
 
 class Region(Model):
@@ -175,4 +175,3 @@ class AdPost(BaseModel):
 class Cart(BaseModel):
     product_id = ForeignKey(Product, on_delete=CASCADE)
     count = IntegerField()
-    created_at = DateTimeField(auto_now_add=True)

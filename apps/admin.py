@@ -16,7 +16,7 @@ class ProductImageModelAdmin(StackedInline):
 @admin.register(Product)
 class ProductModelAdmin(ModelAdmin):
     exclude = 'slug',
-    inlines = ProductImageModelAdmin,
+    model = ProductImageModelAdmin,
 
 
 @admin.register(AdPost)
