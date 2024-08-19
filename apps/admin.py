@@ -1,23 +1,22 @@
 from django.contrib import admin
-from django.contrib.admin import ModelAdmin
+from django.contrib.admin import ModelAdmin, StackedInline
 
-from apps.models import Product, Category, Tag, AdPost, Cart
-from apps.models import Product, Category, Tag, Address
-
-
-@admin.register(Product)
-class ProductModelAdmin(ModelAdmin):
-    pass
+from apps.models import AdPost, Cart, Product, Category, Address, ProductImage
 
 
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
-    pass
+    exclude = 'slug',
 
 
-@admin.register(Tag)
-class Tag(ModelAdmin):
-    pass
+class ProductImageModelAdmin(StackedInline):
+    model = ProductImage,
+
+
+@admin.register(Product)
+class ProductModelAdmin(ModelAdmin):
+    exclude = 'slug',
+    inlines = ProductImageModelAdmin,
 
 
 @admin.register(AdPost)
