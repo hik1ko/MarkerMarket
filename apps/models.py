@@ -1,7 +1,7 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Model, DateTimeField, CharField, SlugField, ImageField, ForeignKey, CASCADE, TextField, \
-    DecimalField, PositiveIntegerField, IntegerField, EmailField, TextChoices
+    PositiveIntegerField, IntegerField, EmailField, TextChoices, FloatField
 from django.utils.text import slugify
 from django_resized import ResizedImageField
 from mptt.fields import TreeForeignKey
@@ -75,11 +75,23 @@ class Category(MPTTModel):
 
 
 class User(AbstractUser):
+    class Role(TextChoices):
+        ADMIN = "admin", 'Admin'
+        OPERATOR = "operator", 'Operator'
+        MANAGER = "manager", 'Manager'
+        DRIVER = "driver", 'Driver'
+        USER = "user", 'User'
+
+    username = None
+    USERNAME_FIELD = 'email'
+    EMAIL_FIELD = EmailField(unique=True)
+    REQUIRED_FIELDS = []
+    objects = CustomUserManager()
+    role = CharField(max_length=50, choices=Role.choices, default=Role.USER)
     full_name = CharField(max_length=255)
-    email = CharField(max_length=255, unique=True)
-    username = CharField(max_length=255, unique=True)
     password = CharField(max_length=255)
-    phone_number = CharField(max_length=255)
+    phone = CharField(max_length=13, unique=True)
+    address = ForeignKey('apps.Address', on_delete=CASCADE, default="-", related_name='addresses')
 
 
 class Address(BaseModel):
@@ -105,13 +117,11 @@ class District(Model):
 
 class Product(BaseModel, BaseSlugModel):
     name = CharField(max_length=255)
-    slug = SlugField
-    price = DecimalField(max_digits=7, decimal_places=2)
+    price = FloatField()
     quantity = PositiveIntegerField(default=0)
     description = TextField(blank=True)
-    category_id = ForeignKey(Category, on_delete=CASCADE)
-    # tag = ManyToManyField('Tag', related_name='tag')
-    company_name = CharField(max_length=255)
+    category = ForeignKey('apps.Category', on_delete=CASCADE, related_name='products')
+    company = CharField(max_length=255)
 
     def __str__(self):
         return self.name
@@ -121,16 +131,12 @@ class Product(BaseModel, BaseSlugModel):
         return self.quantity > 0
 
 
-class ProductImage(Model):
+class ProductImage(BaseModel):
     image = ImageField(upload_to='products/')
     product = ForeignKey('apps.Product', CASCADE, related_name='images')
 
 
-class Tag(BaseSlugModel):
-    pass
-
-
-class Order(Model):
+class Order(BaseModel, BaseSlugModel):
     class StatusMethod(TextChoices):
         COMPLETED = 'completed', 'Completed'
         PROCESSING = 'processing', 'Processing'
@@ -155,18 +161,18 @@ class Order(Model):
     owner = ForeignKey('apps.User', CASCADE, related_name='orders')
 
 
-class SiteSettings(Model):
+class SiteSettings(BaseModel):
     company_phone_number = IntegerField()
     company_email = EmailField()
     company_address = TextField()
 
 
-class AdPost(Model):
+class AdPost(BaseModel):
     category_id = ForeignKey(Category, on_delete=CASCADE)
     image = ImageField(upload_to='ad_posts/')
 
 
-class Cart(Model):
+class Cart(BaseModel):
     product_id = ForeignKey(Product, on_delete=CASCADE)
     count = IntegerField()
     created_at = DateTimeField(auto_now_add=True)
